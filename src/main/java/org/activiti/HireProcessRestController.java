@@ -1,6 +1,5 @@
 package org.activiti;
 
-import org.activiti.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,7 +12,7 @@ import java.util.Map;
 public class HireProcessRestController {
 
     @Autowired
-    private EngineService engineService;
+    private EngineFacade engineFacade;
 
     @Autowired
     private ApplicantRepository applicantRepository;
@@ -27,13 +26,14 @@ public class HireProcessRestController {
         applicantRepository.save(applicant);
 
         Map<String, Object> vars = Collections.<String, Object>singletonMap("applicant", applicant);
-        engineService.startProcess("hireProcessWithJpa", vars);
+        engineFacade.startProcess("hireProcessWithJpa", vars);
         //runtimeService.startProcessInstanceByKey("hireProcessWithJpa", vars);
     }
 
+    // exemples CURL
+
     // start process
     // curl -u admin:admin -H "Content-Type: application/json" -d '{"name":"John Doe", "email": "john.doe@alfresco.com", "phoneNumber":"123456789"}' http://localhost:8080/start-hire-process
-
 
     // read tasks
     // curl -u admin:admin -H "Content-Type: application/json" http://localhost:8080/runtime/tasks
