@@ -27,27 +27,56 @@ public class EngineService {
         return runtimeService.startProcessInstanceByKey(processName, variables);
     }
 
-    public List<Task> findTasksByCriteria(TaskCriteria criteria){
+    //TODO : compléter la recherche,
+    // synchro users activiti et usrs du service ou decl. des strings dans tâches suffit ?
+    // TODO : mais comment travailler alors avec des groupes ?
 
-        //TODO : compléter la recherche, synchro users activiti et usrs du service ?
+
+    public List<Task> findAssignedTasks(String user, String processKey, String processInstanceId){
 
         TaskQuery query = taskService.createTaskQuery();
 
-        if (criteria.getUser() != null){
-            query.taskCandidateOrAssigned(criteria.getUser());
+        query.taskAssignee(user);
+
+        if (processKey != null){
+            query.processDefinitionId(processKey);
         }
 
-        if (criteria.getProcessDefinitionId() != null){
-            query.processDefinitionId(criteria.getProcessDefinitionId());
-        }
-
-        if (criteria.getProcessInstanceId() != null){
-            query.processInstanceId(criteria.getProcessInstanceId());
+        if (processInstanceId != null){
+            query.processInstanceId(processInstanceId);
         }
 
         return query.list();
 
+    }
 
+    public List<Task> findTasks(List<String> groups, String processKey, String processInstanceId){
+
+        TaskQuery query = taskService.createTaskQuery();
+
+        //soit on recherche les tâches que le user courant peut demander (selon ses groupes)
+        if (groups != null && !groups.isEmpty()){
+            query.taskCandidateGroupIn(groups);
+        }
+
+        if (processKey != null){
+            query.processDefinitionId(processKey);
+        }
+
+        if (processInstanceId != null){
+            query.processInstanceId(processInstanceId);
+        }
+
+        return query.list();
+
+    }
+
+    public void claim(String taskId, String userId){
+        taskService.claim(taskId, userId);
+    }
+
+    public void unclaim(String taskId){
+        taskService.unclaim(taskId);
     }
 
     public Task getTasksByGroup(String processInstanceId, String group){

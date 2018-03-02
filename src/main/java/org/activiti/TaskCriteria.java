@@ -1,17 +1,28 @@
 package org.activiti;
 
+import java.util.List;
+
 public class TaskCriteria {
 
 
     private String user;
+    private List<String> groups;
     private String processInstanceId;
-    private String processDefinitionId;
+    private String processKey;
 
     public TaskCriteria() {
     }
 
     public String getUser() {
         return user;
+    }
+
+    public List<String> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<String> groups) {
+        this.groups = groups;
     }
 
     public void setUser(String user) {
@@ -26,12 +37,12 @@ public class TaskCriteria {
         this.processInstanceId = processInstanceId;
     }
 
-    public String getProcessDefinitionId() {
-        return processDefinitionId;
+    public String getProcessKey() {
+        return processKey;
     }
 
-    public void setProcessDefinitionId(String processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessKey(String processKey) {
+        this.processKey = processKey;
     }
 }
 
