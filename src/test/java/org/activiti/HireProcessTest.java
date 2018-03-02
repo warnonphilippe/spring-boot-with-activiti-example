@@ -77,6 +77,7 @@ public class HireProcessTest {
         taskVariables.put("telephoneInterviewOutcome", true);
         taskService.complete(task.getId(), taskVariables);
 
+        // Liste des tâches d'un process donné
         List<Task> tasks = taskService.createTaskQuery()
                 .processInstanceId(processInstance.getId())
                 .orderByTaskName().asc()

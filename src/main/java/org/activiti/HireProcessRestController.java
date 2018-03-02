@@ -13,7 +13,7 @@ import java.util.Map;
 public class HireProcessRestController {
 
     @Autowired
-    private RuntimeService runtimeService;
+    private EngineService engineService;
 
     @Autowired
     private ApplicantRepository applicantRepository;
@@ -27,7 +27,25 @@ public class HireProcessRestController {
         applicantRepository.save(applicant);
 
         Map<String, Object> vars = Collections.<String, Object>singletonMap("applicant", applicant);
-        runtimeService.startProcessInstanceByKey("hireProcessWithJpa", vars);
+        engineService.startProcess("hireProcessWithJpa", vars);
+        //runtimeService.startProcessInstanceByKey("hireProcessWithJpa", vars);
     }
+
+    // start process
+    // curl -u admin:admin -H "Content-Type: application/json" -d '{"name":"John Doe", "email": "john.doe@alfresco.com", "phoneNumber":"123456789"}' http://localhost:8080/start-hire-process
+
+
+    // read tasks
+    // curl -u admin:admin -H "Content-Type: application/json" http://localhost:8080/runtime/tasks
+    // | python -m json.tool
+
+    // complete tasks
+    // curl -u admin:admin -H "Content-Type: application/json" -d '{"action" : "complete", "variables": [ {"name":"telephoneInterviewOutcome", "value":true} ]}' http://localhost:8080/runtime/tasks/14
+
+    // TODO appel de l'API par ressource du microservice, par exemple pour
+    // rechercher tâches du users courant et/ou d'un type donné
+    // appeler le complétude d'une tâche lorsque l'on enregistre un formulaire associé à la tâche
+    // etc...
+    // voir class EngineService, class de test,...
 
 }
