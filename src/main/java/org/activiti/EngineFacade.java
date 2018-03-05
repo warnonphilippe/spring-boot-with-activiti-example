@@ -52,14 +52,25 @@ public class EngineFacade {
      */
     public TaskQuery findClaimableTasks(String user, List<String> groups, String processKey, String processInstanceId){
 
-        TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant());
+        TaskQuery query = taskService.createTaskQuery()
+                .taskTenantId(getCurrentTenant());
 
-        if (user != null){
-            query.taskCandidateUser(user);
-        }
+        if (user != null || (groups != null && !groups.isEmpty())){
 
-        if (groups != null && !groups.isEmpty()){
-            query.taskCandidateGroupIn(groups);
+            query = query.or();
+
+            //taches assignées au user
+            if (user != null){
+                query.taskCandidateUser(user);
+            }
+
+            //taches dont il peut demander l'assignation
+            if (groups != null && !groups.isEmpty()){
+                query.taskCandidateGroupIn(groups);
+            }
+
+            query = query.endOr();
+
         }
 
         if (processKey != null){
@@ -112,22 +123,29 @@ public class EngineFacade {
      */
     public TaskQuery findTasks(String user, List<String> groups, String processKey, String processInstanceId) {
 
-        TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant()).or();
+        TaskQuery query = taskService.createTaskQuery()
+                .taskTenantId(getCurrentTenant());
 
-        //taches assignées au user
-        if (user != null){
-            query.taskAssignee(user);
-            query.taskCandidateUser(user);
-            //travail avec les groupes définis dans acticiti, on ne les utilise pas
-            //query.taskCandidateOrAssigned(user);
+        if (user != null || (groups != null && !groups.isEmpty())){
+
+            query = query.or();
+
+            //taches assignées au user
+            if (user != null){
+                query.taskAssignee(user);
+                query.taskCandidateUser(user);
+                //travail avec les groupes définis dans acticiti, on ne les utilise pas
+                //query.taskCandidateOrAssigned(user);
+            }
+
+            //taches dont il peut demander l'assignation
+            if (groups != null && !groups.isEmpty()){
+                query.taskCandidateGroupIn(groups);
+            }
+
+            query = query.endOr();
+
         }
-
-        //taches dont il peut demander l'assignation
-        if (groups != null && !groups.isEmpty()){
-            query.taskCandidateGroupIn(groups);
-        }
-
-        query.endOr();
 
         if (processKey != null){
             query.processDefinitionId(processKey);

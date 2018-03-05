@@ -74,7 +74,7 @@ public class MyApp {
                     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
 
 
-                    String fileName = "Developer_Hiring_with_jpa.bpmn20.xml";
+                    String fileName = "processes/Developer_Hiring_with_jpa.bpmn20.xml";
 
                     ClassLoader classLoader = getClass().getClassLoader();
                     File file = new File(classLoader.getResource(fileName).getFile());
@@ -87,11 +87,8 @@ public class MyApp {
                     Deployment deployment = deploymentBuilder.deploy();
 
                 } catch (Exception ex) {
-                    if (ex instanceof ActivitiException) {
-                        throw (ActivitiException)ex;
-                    } else {
-                        throw new ActivitiException(ex.getMessage(), ex);
-                    }
+                    ex.printStackTrace();
+                    throw ex;
                 }
 
             }
