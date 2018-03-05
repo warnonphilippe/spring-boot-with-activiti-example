@@ -24,13 +24,11 @@ public class EngineFacade {
     }
 
     public ProcessInstance startProcess(String processName, Map<String, Object> variables){
-        return runtimeService.startProcessInstanceByKey(processName, variables);
+        return runtimeService.startProcessInstanceByKeyAndTenantId(processName, variables, getCurrentTenant());
     }
 
-    //TODO : compléter la recherche,
-    // synchro users activiti et usrs du service ou decl. des strings dans tâches suffit ?
-    // TODO : comment travailler alors avec des groupes ?
-
+    // TODO : compléter la recherche,
+    // TODO :  A tester, synchro users activiti et usrs du service ou decl. des strings dans tâches suffit ?
 
     /**
      * Recherche la liste des tasks déjà assignées à un user
@@ -67,7 +65,7 @@ public class EngineFacade {
      */
     public List<Task> findClaimableTasks(List<String> groups, String processKey, String processInstanceId){
 
-        TaskQuery query = taskService.createTaskQuery();
+        TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant());
 
         //soit on recherche les tâches que le user courant peut demander (selon ses groupes)
         if (groups != null && !groups.isEmpty()){
@@ -99,7 +97,7 @@ public class EngineFacade {
      */
     public List<Task> findTasks(String user, List<String> groups, String processKey, String processInstanceId) {
 
-        TaskQuery query = taskService.createTaskQuery().or();
+        TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant()).or();
 
         if (user != null){
             query.taskAssignee(user);
@@ -159,5 +157,8 @@ public class EngineFacade {
         taskService.complete(taskId, params);
     }
 
+    private String getCurrentTenant(){
+        return TenantUtils.getCurrentTenant();
+    }
 
 }
