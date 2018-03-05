@@ -30,6 +30,50 @@ public class EngineFacade {
     // TODO : compléter la recherche,
     // TODO :  A tester, synchro users activiti et usrs du service ou decl. des strings dans tâches suffit ?
 
+
+    /**
+     * Dans la config des processus, les tâches seront associées à des candidates-groups
+     * Le user connecté pourra donc accéder aux tâches
+     *  - associées à des groupes dont il est membre
+     *  - lui étant assignées
+     * Avant de traiter une tâche, le tâche devra être assignée au user
+     *  - soit lors de sas définition
+     *  - soit en faisant un claim d'une tâche associé à un groupe dont il est membre
+     *
+     */
+
+    /**
+     * Recherche la liste des tasks pouvant être traitées à un user selon ses groupes,
+     * il devra alors demander que la task lui soit assignée avant de la traitée (cfr claim)
+     * @param groups groupes autorisés à traiter les tâches
+     * @param processKey
+     * @param processInstanceId
+     * @return
+     */
+    public TaskQuery findClaimableTasks(String user, List<String> groups, String processKey, String processInstanceId){
+
+        TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant());
+
+        if (user != null){
+            query.taskCandidateUser(user);
+        }
+
+        if (groups != null && !groups.isEmpty()){
+            query.taskCandidateGroupIn(groups);
+        }
+
+        if (processKey != null){
+            query.processDefinitionId(processKey);
+        }
+
+        if (processInstanceId != null){
+            query.processInstanceId(processInstanceId);
+        }
+
+        return query;
+
+    }
+
     /**
      * Recherche la liste des tasks déjà assignées à un user
      * @param user
@@ -37,7 +81,7 @@ public class EngineFacade {
      * @param processInstanceId
      * @return
      */
-    public List<Task> findAssignedTasks(String user, String processKey, String processInstanceId){
+    public TaskQuery findAssignedTasks(String user, String processKey, String processInstanceId){
 
         TaskQuery query = taskService.createTaskQuery();
 
@@ -51,36 +95,7 @@ public class EngineFacade {
             query.processInstanceId(processInstanceId);
         }
 
-        return query.list();
-
-    }
-
-    /**
-     * Recherche la liste des tasks pouvant être traitées par un user,
-     * il devra alors demander que la task lui soit assignée avant de la traitée
-     * @param groups
-     * @param processKey
-     * @param processInstanceId
-     * @return
-     */
-    public List<Task> findClaimableTasks(List<String> groups, String processKey, String processInstanceId){
-
-        TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant());
-
-        //soit on recherche les tâches que le user courant peut demander (selon ses groupes)
-        if (groups != null && !groups.isEmpty()){
-            query.taskCandidateGroupIn(groups);
-        }
-
-        if (processKey != null){
-            query.processDefinitionId(processKey);
-        }
-
-        if (processInstanceId != null){
-            query.processInstanceId(processInstanceId);
-        }
-
-        return query.list();
+        return query;
 
     }
 
@@ -95,14 +110,19 @@ public class EngineFacade {
      * @param processInstanceId
      * @return
      */
-    public List<Task> findTasks(String user, List<String> groups, String processKey, String processInstanceId) {
+    public TaskQuery findTasks(String user, List<String> groups, String processKey, String processInstanceId) {
 
         TaskQuery query = taskService.createTaskQuery().taskTenantId(getCurrentTenant()).or();
 
+        //taches assignées au user
         if (user != null){
             query.taskAssignee(user);
+            query.taskCandidateUser(user);
+            //travail avec les groupes définis dans acticiti, on ne les utilise pas
+            //query.taskCandidateOrAssigned(user);
         }
 
+        //taches dont il peut demander l'assignation
         if (groups != null && !groups.isEmpty()){
             query.taskCandidateGroupIn(groups);
         }
@@ -117,7 +137,7 @@ public class EngineFacade {
             query.processInstanceId(processInstanceId);
         }
 
-        return query.list();
+        return query;
 
     }
 
