@@ -471,4 +471,6 @@ Given that this is a Spring Boot application, everything done here in Maven can 
 Userguide : https://www.activiti.org/userguide/index.html#springSpringBoot
 Spring boot : http://www.baeldung.com/spring-activiti
 Spring security : http://www.baeldung.com/activiti-spring-security
+Multitenant : http://www.jorambarrez.be/blog/2015/10/06/multi-tenancy-separate-database-schemas-in-activiti/
+
 
