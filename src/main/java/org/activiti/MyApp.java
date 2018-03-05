@@ -100,6 +100,8 @@ public class MyApp {
 
 
     // TODO : test un deploy avec DeploymentCollectionResource
+    // TODO : voir secu d'accès à l'api Rest de activiti
+    // TODO : faire une ressource
 
 
 }
