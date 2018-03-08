@@ -2,6 +2,9 @@ package org.activiti;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Modele pour la demo du processus activiti hireProcessWithJpa
+ */
 @Component
 public class ResumeService {
 
