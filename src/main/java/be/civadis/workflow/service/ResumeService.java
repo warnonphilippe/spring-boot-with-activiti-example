@@ -1,9 +1,9 @@
-package org.activiti;
+package be.civadis.workflow.service;
 
 import org.springframework.stereotype.Component;
 
 /**
- * Modele pour la demo du processus activiti hireProcessWithJpa
+ * Modele pour la demo du processus workflow hireProcessWithJpa
  */
 @Component
 public class ResumeService {

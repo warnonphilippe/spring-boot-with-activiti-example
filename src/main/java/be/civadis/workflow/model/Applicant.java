@@ -1,15 +1,8 @@
-package org.activiti;
+package be.civadis.workflow.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import java.io.Serializable;
 
-@Entity
-public class Applicant {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Applicant implements Serializable {
 
     private String name;
 
@@ -18,21 +11,12 @@ public class Applicant {
     private String phoneNumber;
 
     public Applicant() {
-
     }
 
     public Applicant(String name, String email, String phoneNumber) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

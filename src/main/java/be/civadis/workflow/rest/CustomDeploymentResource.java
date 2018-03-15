@@ -1,5 +1,6 @@
-package org.activiti;
+package be.civadis.workflow.rest;
 
+import be.civadis.workflow.security.AuthoritiesConstants;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.RepositoryService;
@@ -15,10 +16,8 @@ import org.activiti.rest.service.api.repository.DeploymentsPaginateList;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -28,8 +27,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Ressource permettant le déploiements de processus (peut être sécurisée par oauth2)
+ * Rem :
+ *  Les déploiements peuvent aussi être réalisés par l'UI workflow
+ *  L'API rest native de workflow peut être exposée par Spring-boot, mais elle est sécurisée par basic oauth
+ */
 @RestController
-public class DeploymentRestController {
+@RequestMapping("/workflow")
+public class CustomDeploymentResource {
     protected static final String DEPRECATED_API_DEPLOYMENT_SEGMENT = "deployment";
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap();
     @Autowired
@@ -37,16 +43,17 @@ public class DeploymentRestController {
     @Autowired
     protected RepositoryService repositoryService;
 
-    public DeploymentRestController() {
+    public CustomDeploymentResource() {
     }
 
-    //TODO : a sécuriser avec OAuth2 (@Secured... dans un projet avec Spring Secu et OAuth2 et config des routes)
-
-    @RequestMapping(
-            value = {"/deployments"},
-            method = {RequestMethod.GET},
-            produces = {"application/json"}
-    )
+    /**
+     * Retourne la liste des déploiements
+     * @param allRequestParams
+     * @param request
+     * @return
+     */
+    @GetMapping("/deployments")
+    @Secured({AuthoritiesConstants.ADMIN})
     public DataResponse getDeployments(@RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DeploymentQuery deploymentQuery = this.repositoryService.createDeploymentQuery();
         if (allRequestParams.containsKey("name")) {
@@ -84,11 +91,15 @@ public class DeploymentRestController {
         return response;
     }
 
-    @RequestMapping(
-            value = {"/deployments"},
-            method = {RequestMethod.POST},
-            produces = {"application/json"}
-    )
+    /**
+     * Déploie une définition de processus
+     * @param tenantId
+     * @param request
+     * @param response
+     * @return
+     */
+    @PostMapping("/deployments")
+    @Secured({AuthoritiesConstants.ADMIN})
     public DeploymentResponse uploadDeployment(@RequestParam(value = "tenantId",required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new ActivitiIllegalArgumentException("Multipart request is required");
